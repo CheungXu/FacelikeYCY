@@ -1,12 +1,13 @@
-#from skimage.measure import compare_ssim,compare_mse,compare_psnr
 import cv2,os,sys
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+#os.environ['CUDA_VISIBLE_DEVICES']='0'
+
 import tensorflow as tf
 import numpy as np
 import scipy.misc
 import cv2
 import facenet
-#import seaborn as sns
-#import matplotlib.pyplot as plt
 
 class FaceDistence(object):
   def __init__(self,img_size = 200, model_dir = os.path.join('.','model','20180512-110547.pb')):
@@ -63,7 +64,7 @@ if __name__ == '__main__':
     max_dist = 1.40
     if len(sys.argv) < 3:
         src_path = os.path.join('.','data','AF2.jpg')
-        dst_path = os.path.join('.','data','test.jpg')
+        dst_path = os.path.join('.','data','ycy.jpg')
     
     with FaceDistence() as fd:
         dist = fd.compare(src_path, dst_path)
