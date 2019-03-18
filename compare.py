@@ -8,7 +8,44 @@ import numpy as np
 import scipy.misc
 import cv2
 import facenet
+import detect_face
 
+class FaceAlign(object):
+    def __init__(self, model_dir = os.path.join('.','model')):
+        self.__min_size = 100
+        self.__threshold = [ 0.6, 0.7, 0.7 ]
+        self.__factor = 0.709
+        tf.Graph().as_default()
+        self.__sess = tf.Session()
+        with self.__sess.as_default():
+            self.__pnet, self.__rnet, self.__onet = detect_face.create_mtcnn(self.__sess, model_dir)
+            
+    def align(self, image):
+        margin = 44
+        image_size = 200
+        img_size = np.asarray(image.shape)[0:2]
+        bounding_boxes, _ = detect_face.detect_face(image, self.__min_size, self.__pnet, self.__rnet, self.__onet, self.__threshold, self.__factor)
+        if len(bounding_boxes) < 1:
+            return None
+        det = np.squeeze(bounding_boxes[0,0:4])
+        box_length = np.maximum(det[3]-det[1], det[2]-det[0])
+        center = [np.floor((det[3]-det[1])/2)+det[1], np.floor((det[2]-det[0])/2)+det[0]]
+        bb = np.zeros(4, dtype=np.int32)
+        bb[0] = np.maximum(center[1]-box_length/2,0)
+        bb[1] = np.maximum(center[0]-box_length/2,0)
+        bb[2] = np.minimum(center[1]+box_length/2,img_size[1])
+        bb[3] = np.minimum(center[0]+box_length/2,img_size[0])
+        """
+        bb[0] = np.maximum(det[0]-margin/2, 0)
+        bb[1] = np.maximum(det[1]-margin/2, 0)
+        bb[2] = np.minimum(det[2]+margin/2, img_size[1])
+        bb[3] = np.minimum(det[3]+margin/2, img_size[0])
+        """
+        cropped = img[bb[1]:bb[3],bb[0]:bb[2],:]
+        aligned = scipy.misc.imresize(cropped, (image_size, image_size), interp='bilinear')
+        
+        return cropped, aligned
+        
 class FaceDistence(object):
   def __init__(self,img_size = 200, model_dir = os.path.join('.','model','20180512-110547.pb')):
     self.__image_size = 200
@@ -17,7 +54,8 @@ class FaceDistence(object):
     #Get Session And Load Model
     tf.Graph().as_default()
     self.__sess = tf.Session()
-    facenet.load_model(self.__model_dir)
+    with self.__sess.as_default():
+        facenet.load_model(self.__model_dir)
     
     #Create Placeholder
     self.__images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
@@ -57,7 +95,9 @@ class FaceDistence(object):
 
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':         
+    """
+    #Distance Testing
     src_path = ''
     dst_path = ''
     min_dist = 0.75
@@ -73,6 +113,19 @@ if __name__ == '__main__':
         dist = min_dist if dist<min_dist else dist
         score = 100.0-100*(dist-min_dist)/(max_dist-min_dist)
         print('Similarity Percent: %.2f' % (score))
+    """
+    
+    #Detect Testing
+    fa = FaceAlign()
+    img = cv2.imread('./data/1.jpg',1)
+    croped_img, align_img = fa.align(img)
+    cv2.imshow('1',img)
+    cv2.imshow('2',align_img)
+    cv2.imshow('3',croped_img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    cv2.imwrite('ycy.jpg',align_img)
+                 
             
 
   
