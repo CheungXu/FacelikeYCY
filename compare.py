@@ -10,6 +10,7 @@ import cv2
 import facenet
 import detect_face
 
+
 class FaceAlign(object):
     def __init__(self, model_dir = os.path.join('.','model')):
         self.__min_size = 100
@@ -127,8 +128,26 @@ class Facelike(object):
         print('Similarity Percent: %.2f' % (score))
         
         return dist, score
+
+flags = tf.app.flags
+flags.DEFINE_string('src_path', '', 'Path of First Compared Image')
+flags.DEFINE_string('dst_path', '', 'Path of Second Compared Image')
+flags.DEFINE_integer('image_size', 200, 'Size of Images(Max 200)')
+FLAGS = flags.FLAGS
+
+def main(_):
+    #Face Like Testing
+    print(flags.FLAGS.__flags)
+    if not os.path.exists(FLAGS.src_path) or not os.path.exists(FLAGS.dst_path):
+        print('ERROR: Images Path Does Not Exists !')
+        return
+    src_path = FLAGS.src_path
+    dst_path = FLAGS.dst_path
+    with Facelike() as fl:
+        dist, score = fl.face_similar(src_path, dst_path)
     
-if __name__ == '__main__':         
+if __name__ == '__main__':
+    tf.app.run()
     """
     #Distance Testing Without Align
     src_path = ''
@@ -158,11 +177,14 @@ if __name__ == '__main__':
     cv2.destroyAllWindows()
     cv2.imwrite('ycy.jpg',align_img)
     """
+    """
     #Face Like Testing
-    src_path = ''
-    dst_path = ''
-    #if len(sys.argv) < 3:
-    #    src_path = os.path.join('.','YCYData','lmy.jpg')
+    pp.print(flags.FLAGS.__flags)
+    if not os.path.exists(FLAGS.src_path) or not os.path.exists(FLAGS.dst_path):
+        print('ERROR: Images Path Does Not Exists !')
+        return
+    src_path = FLAGS.src_path
+    dst_path = FLAGS.dst_path
     dst_path = os.path.join('.','YCYData','ycy.jpg')
     with Facelike() as fl:
         files = os.listdir(os.path.join('.','YCYData'))
@@ -170,6 +192,7 @@ if __name__ == '__main__':
             src_path = os.path.join('.','YCYData',f)
             print('==================%s================' % f)
             dist, score = fl.face_similar(src_path, dst_path)
+    """
                  
             
 
