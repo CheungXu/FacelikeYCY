@@ -1,8 +1,13 @@
 # FacelikeYCY
 This Program can be used to calculate Face-Similarity with [YangChaoyue](https://weibo.com/u/5644764907).
+[中文文档](https://github.com/CheungXu/FacelikeYCY/blob/master/README_CN.md)
 
-## Compatibility
-The code is tested using Tensorflow r1.12.0 under Ubuntu 18.04 with Python 3.5.
+
+## Environment
++ Ubuntu 18.04
++ Python 3.5
++ Tensorflow r1.12.0
++ OpenCV 4.0.0
 
 ## Usage
 
