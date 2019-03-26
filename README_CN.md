@@ -1,5 +1,5 @@
 # FacelikeYCY
-本项目可用于计算与 [YangChaoyue](https://weibo.com/u/5644764907)的人脸相似度.
+本项目可用于计算与 [杨超越](https://weibo.com/u/5644764907)的人脸相似度.
 
 ## 代码运行环境：
 + Ubuntu 18.04
@@ -14,7 +14,7 @@
 ```git
 git clone https://github.com/CheungXu/FacelikeYCY
 ```
-（2）从[HERE](https://pan.baidu.com/s/1w0HFw4alVqpWTYJj5bO00Q)(Code:phfv)下载预训练模型。
+（2）从[HERE](https://pan.baidu.com/s/1w0HFw4alVqpWTYJj5bO00Q)(提取码:phfv)下载预训练模型。
 
 
 （3）解压模型文件:
