@@ -106,7 +106,23 @@ class Facelike(object):
         self.__fa.close()
         self.__fd.close()
     
-    def face_similar(self, src_path, dst_path):
+    def face_similar(self, src_img, dst_img):
+        src_img = self.__fa.detect(src_img)
+        src_img = cv2.resize(src_img, (self.__image_size, self.__image_size), interpolation=cv2.INTER_CUBIC)
+        src_img = facenet.prewhiten(src_img)
+        dst_img = self.__fa.detect(dst_img)
+        dst_img = cv2.resize(dst_img, (self.__image_size, self.__image_size), interpolation=cv2.INTER_CUBIC)
+        dst_img = facenet.prewhiten(dst_img) 
+        
+        dist = self.__fd.compare(src_img, dst_img)
+        
+        dist = self.__max_dist if dist>self.__max_dist else dist
+        dist = self.__min_dist if dist<self.__min_dist else dist
+        score = 100.0-100*(dist-self.__min_dist)/(self.__max_dist-self.__min_dist)
+        
+        return dist, score
+                
+    def face_similar_with_path(self, src_path, dst_path):
         #Load Image, Detect Face and Preprocess
         src_img = scipy.misc.imread(src_path, mode='RGB')
         src_img = self.__fa.detect(src_img)
@@ -144,7 +160,7 @@ def main(_):
     src_path = FLAGS.src_path
     dst_path = FLAGS.dst_path
     with Facelike() as fl:
-        dist, score = fl.face_similar(src_path, dst_path)
+        dist, score = fl.face_similar_with_path(src_path, dst_path)
     
 if __name__ == '__main__':
     tf.app.run()
