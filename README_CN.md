@@ -40,7 +40,7 @@ python compare.py --src_path ./data/ycy.jpg --dst_path ./data/ycy2.jpg --image_s
 Face Distance: 0.74, Similarity Percent: 83.90
 ```
 ## 服务器&客户端模式
-### 1、Start Service
+### 1、启动服务
 
 运行:
 ```bash 
