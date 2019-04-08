@@ -10,7 +10,7 @@ This Program can be used to calculate Face-Similarity with [YangChaoyue](https:/
 + Tensorflow r1.12.0
 + OpenCV 4.0.0
 
-## Usage
+## Local Usage 
 
 ### 1、Clone Code & Download Model
 （1）Clone Code:
@@ -31,7 +31,7 @@ unzip model.zip
 python compare.py --src_path [first image path] --dst_path [second image path] --image_size [image size (Max 200)]
 ```
 
-## Example & Result
+### 3、Example & Result
 
 Run:
 ```bash 
@@ -42,6 +42,39 @@ Result:
 ```bash
 Face Distance: 0.74, Similarity Percent: 83.90
 ```
+
+## Server&Client Mode
+
+### 1、Start Service
+
+Run:
+```bash 
+python server.py
+```
+Output：
+```bash
+ * Serving Flask app "server" (lazy loading)
+ * Environment: production
+   WARNING: Do not use the development server in a production environment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+ * Running on http://0.0.0.0:6006/ (Press CTRL+C to quit)
+```
+The service is listening on port 6006 by default.
+
+### 2、Post and Get Result
+Run:
+```bash 
+python client.py
+```
+
+Resutl：
+```bash
+<Response [200]>
+{"score":"84.84680122799344"}
+Time: 0.188511s
+```
+See the code for more information.
 
 ## Issue
 If you find the bug and problem, Thanks for your issue to propose it.
