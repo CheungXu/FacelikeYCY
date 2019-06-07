@@ -1,7 +1,7 @@
 import cv2,os,sys
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-#os.environ['CUDA_VISIBLE_DEVICES']='0'
+#os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ['CUDA_VISIBLE_DEVICES']='0'
 
 import tensorflow as tf
 import numpy as np
@@ -70,7 +70,15 @@ class FaceDistence(object):
         self.__embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
         self.__phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
         self.__embedding_size = self.__embeddings.get_shape()[1]
-  
+
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, exec_type, exec_value, exec_trace):
+        self.__image_size = 0
+        self.__model_dir = ''
+        self.__sess.close()
+        
     def close(self):
         self.__image_size = 0
         self.__model_dir = ''
@@ -106,13 +114,18 @@ class Facelike(object):
         self.__fa.close()
         self.__fd.close()
     
-    def face_similar(self, src_img, dst_img):
-        src_img = self.__fa.detect(src_img)
-        src_img = cv2.resize(src_img, (self.__image_size, self.__image_size), interpolation=cv2.INTER_CUBIC)
-        src_img = facenet.prewhiten(src_img)
-        dst_img = self.__fa.detect(dst_img)
-        dst_img = cv2.resize(dst_img, (self.__image_size, self.__image_size), interpolation=cv2.INTER_CUBIC)
-        dst_img = facenet.prewhiten(dst_img) 
+    def face_similar(self, src_img, dst_img, detect = True, resized = True, prewhiten = True):
+        if detect:
+            src_img = self.__fa.detect(src_img)
+            dst_img = self.__fa.detect(dst_img)
+        
+        if resized:
+            src_img = cv2.resize(src_img, (self.__image_size, self.__image_size), interpolation=cv2.INTER_CUBIC)
+            dst_img = cv2.resize(dst_img, (self.__image_size, self.__image_size), interpolation=cv2.INTER_CUBIC)
+            
+        if prewhiten:
+            src_img = facenet.prewhiten(src_img)
+            dst_img = facenet.prewhiten(dst_img)
         
         dist = self.__fd.compare(src_img, dst_img)
         
@@ -135,13 +148,13 @@ class Facelike(object):
         
         #Face Distance
         dist = self.__fd.compare(src_img, dst_img)
-        print('Face Distance: %.2f' % dist)
+        #print('Face Distance: %.2f' % dist)
         
         #Trans To Percentage
         dist = self.__max_dist if dist>self.__max_dist else dist
         dist = self.__min_dist if dist<self.__min_dist else dist
         score = 100.0-100*(dist-self.__min_dist)/(self.__max_dist-self.__min_dist)
-        print('Similarity Percent: %.2f' % (score))
+        #print('Similarity Percent: %.2f' % (score))
         
         return dist, score
 
